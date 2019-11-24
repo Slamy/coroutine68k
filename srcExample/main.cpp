@@ -6,6 +6,7 @@
  */
 
 #include "config.h"
+#include "multiplatform.h"
 
 #include <iomanip>
 #include <list>
@@ -17,7 +18,17 @@
 
 #include <algorithm> //algorithm must be included latest for bebbo toolchain
 
+#include "CiaMeasure.h"
 #include "Coroutine68k.h"
+#include "Protothread.h"
+
+#include "sample_coroutine68.h"
+#include "sample_stackless.h"
+
+#ifdef BUILD_FOR_AMIGADOS
+volatile struct Custom* mycustom = (volatile struct Custom*)0xDFF000;
+volatile struct CIA* myciaa		 = (volatile struct CIA*)0xbfe001;
+#endif
 
 extern "C"
 {
@@ -56,49 +67,12 @@ void* __dso_handle;
 
 #endif
 
-class TestCoroutine : public Coroutine68k
+void empty()
 {
-  public:
-	void func() override;
-	void funcInner();
-
-  private:
-};
-
-void TestCoroutine::funcInner()
-{
-	int iteration = 0;
-	printf("    - %d\n", iteration++);
-	coYield();
-	printf("    - %d\n", iteration++);
-	coYield();
-	printf("    - %d\n", iteration++);
 }
 
-void TestCoroutine::func()
-{
-	int iterationOuter = 0;
-	printf("  - %d\n", iterationOuter++);
-	coYield();
-	printf("  - %d\n", iterationOuter++);
-	funcInner();
-	printf("  - %d\n", iterationOuter++);
-	funcInner();
-	printf("  - %d\n", iterationOuter++);
-}
-
-class WaitTest : public Coroutine68k
-{
-  public:
-	volatile bool gotIt = false;
-
-	void func() override
-	{
-		printf("Not Yet\n");
-		CO_WAIT_UNTIL(gotIt);
-		printf("Finished\n");
-	}
-};
+LambdaWaitTest wait_lambda;
+MacroWaitTest wait_macro;
 
 int main(int argc, char** argv)
 {
@@ -106,45 +80,19 @@ int main(int argc, char** argv)
 #if !defined(BUILD_FOR_AMIGADOS)
 	staticConstructors();
 #endif
+	printf("Slamy's Coroutine Example for 68k\n");
 
-	printf("Slamy's Coroutine for 68k\n");
+	printf("ciaa ticks inside empty %d\n", measureTime(empty));
+	printf("ciaa ticks inside test_protoThread %d\n", measureTime(sample_stackless_protoThread));
+	printf("ciaa ticks inside test_innerOuter %d\n", measureTime(sample_coroutine68k_innerOuter));
 
-#if 0
-	TestCoroutine cotest;
-	cotest.init();
+	printf("ciaa ticks inside test_ioWaiting(wait_lambda) %d\n",
+		   measureTime(std::bind(sample_coroutine68k_ioWaiting, wait_lambda)));
 
-	int iteration = 0;
+	printf("ciaa ticks inside test_ioWaiting(wait_macro) %d\n",
+		   measureTime(std::bind(sample_coroutine68k_ioWaiting, wait_macro)));
 
-	printf("- %d\n", iteration++);
-	while (!cotest.run())
-	{
-		printf("- %d\n", iteration++);
-	}
-	printf("- %d\n", iteration++);
-
-	printf("outside finished!\n");
-#else
-
-	WaitTest wait;
-
-	wait.init();
-	int iteration;
-
-	for (iteration = 0; iteration < 7; iteration++)
-	{
-		if (iteration == 3)
-			wait.gotIt = true;
-		bool ret = wait.run();
-		if (ret)
-		{
-			printf("T %d\n", iteration);
-		}
-		else
-		{
-			printf("F %d\n", iteration);
-		}
-	}
-#endif
+	printf("ciaa ticks inside empty %d\n", measureTime(empty));
 
 	return 0;
 }

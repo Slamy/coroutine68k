@@ -1,2 +1,3 @@
 
 #cmakedefine BUILD_FOR_AMIGADOS
+#cmakedefine MEASURE_TIME

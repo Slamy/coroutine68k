@@ -3,15 +3,19 @@ cmake_minimum_required (VERSION 3.12.0)
 project (coroutine68k C CXX ASM)
 
 option(BUILD_FOR_AMIGADOS "Build for AmigaDOS" false)
+option(MEASURE_TIME "Use CIA to measure time" false)
 
 include_directories(srcExample)
 include_directories(srcExample/util)
 include_directories(srcCoroutine)
+include_directories(srcBenhoyt)
 include_directories(${CMAKE_BINARY_DIR})
 
 SET (SOURCES
 	srcExample/main.cpp
 	srcCoroutine/Coroutine68k.cpp
+	srcExample/sample_coroutine68k.cpp
+	srcExample/sample_stackless.cpp
 	context.o
 )
 

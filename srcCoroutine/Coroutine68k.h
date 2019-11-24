@@ -9,6 +9,7 @@
 #define INCLUDE_COROUTINE68K_H_
 
 #include <assert.h>
+#include <functional>
 #include <stdint.h>
 #include <vector>
 
@@ -21,8 +22,13 @@
 class Coroutine68k
 {
   private:
-	uint32_t* normalStack	= nullptr; // offset 4. Don't move this variable!
+	/// saved stack pointer outside of coroutine
+	uint32_t* normalStack = nullptr; // offset 4. Don't move this variable!
+
+	/// saved stack pointer inside of coroutine
 	uint32_t* coroutineStack = nullptr; // offset 8. Don't move this variable!
+
+	/// Indicates a valid coroutine context.
 
 	bool yielded = false;
 
@@ -106,6 +112,7 @@ class Coroutine68k
 
 	/**
 	 * Suspend execution as long as cond is true
+	 * FIXME By C++ standard this is considered bad as it is a macro. But maybe it's faster...
 	 */
 #define CO_WAIT_WHILE(cond)                                                                        \
 	while (cond)                                                                                   \
@@ -114,12 +121,39 @@ class Coroutine68k
 	}
 
 	/**
-	 * Suspend execution as long as cond is false
+	 * Suspend execution as long as cond is false.
+	 * FIXME By C++ standard this is considered bad as it is a macro. But maybe it's faster...
 	 */
 #define CO_WAIT_UNTIL(cond)                                                                        \
 	while (!cond)                                                                                  \
 	{                                                                                              \
 		coYield();                                                                                 \
+	}
+
+	/**
+	 * Suspend execution as long as cond is false
+	 * FIXME This is a more modern C++ solution than the macro CO_WAIT_UNTIL.
+	 * But I need to analyze performance.
+	 */
+	void coWaitUntil(std::function<bool()> cond)
+	{
+		while (!cond())
+		{
+			coYield();
+		}
+	}
+
+	/**
+	 * Suspend execution as long as cond is true
+	 * FIXME This is a more modern C++ solution than the macro CO_WAIT_WHILE.
+	 * But I need to analyze performance.
+	 */
+	void coWaitWhile(std::function<bool()> cond)
+	{
+		while (cond())
+		{
+			coYield();
+		}
 	}
 };
 
