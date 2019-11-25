@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <vector>
 
-#define DEBUG_STACK_CHECK
+//#define DEBUG_STACK_CHECK
 
 /**
  * Implementation of stackfull coroutines on the 68k architecture.

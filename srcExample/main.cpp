@@ -71,6 +71,24 @@ void empty()
 {
 }
 
+class JumpInOutCoroutine : public Coroutine68k
+{
+  public:
+	void func() override
+	{
+		coYield();
+		coYield();
+		coYield();
+	}
+	void empty()
+	{
+	}
+
+  private:
+};
+
+JumpInOutCoroutine jumpInOut;
+
 LambdaWaitTest wait_lambda;
 MacroWaitTest wait_macro;
 
@@ -93,6 +111,17 @@ int main(int argc, char** argv)
 		   measureTime(std::bind(sample_coroutine68k_ioWaiting, wait_macro)));
 
 	printf("ciaa ticks inside empty %d\n", measureTime(empty));
+
+	jumpInOut.init();
+
+	printf("ciaa ticks inside jumpInOut %d\n",
+		   measureTime(std::bind(&JumpInOutCoroutine::run, &jumpInOut)));
+	printf("ciaa ticks inside jumpInOut %d\n",
+		   measureTime(std::bind(&JumpInOutCoroutine::run, &jumpInOut)));
+	printf("ciaa ticks inside jumpInOut std::bind empty %d\n",
+		   measureTime(std::bind(&JumpInOutCoroutine::empty, &jumpInOut)));
+
+	// printf("ciaa ticks inside empty %d\n", measureTime(std::bind(jumpInOut, run)));
 
 	return 0;
 }
