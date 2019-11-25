@@ -27,98 +27,44 @@ TestCoroutine cotest;
 
 void TestCoroutine::funcInner()
 {
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
 	int iteration = 0;
-	printf("    - %d\n", iteration++);
-#endif
-
+	debugLogf("    - %d\n", iteration++);
 	coYield();
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("    - %d\n", iteration++);
-#endif
-
+	debugLogf("    - %d\n", iteration++);
 	coYield();
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("    - %d\n", iteration++);
-#endif
+	debugLogf("    - %d\n", iteration++);
 }
 
 void TestCoroutine::func()
 {
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
 	int iterationOuter = 0;
-	printf("  - %d\n", iterationOuter++);
-#endif
-
+	debugLogf("  - %d\n", iterationOuter++);
 	coYield();
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("  - %d\n", iterationOuter++);
-#endif
-
+	debugLogf("  - %d\n", iterationOuter++);
 	funcInner();
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("  - %d\n", iterationOuter++);
-#endif
-
+	debugLogf("  - %d\n", iterationOuter++);
 	funcInner();
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("  - %d\n", iterationOuter++);
-#endif
+	debugLogf("  - %d\n", iterationOuter++);
 }
 
 void sample_coroutine68k_innerOuter()
 {
 	cotest.init();
 
-#ifdef MEASURE_TIME
-	while (!cotest.run())
-		;
-#else
-	printf("%s\n", __func__);
+	debugLogf("%s\n", __func__);
 	int iteration = 0;
-	printf("- %d\n", iteration++);
+	debugLogf("- %d\n", iteration++);
 	while (!cotest.run())
 	{
-		printf("- %d\n", iteration++);
+		debugLogf("- %d\n", iteration++);
 	}
-	printf("- %d\n", iteration++);
-	printf("outside finished!\n");
-#endif
+	debugLogf("- %d\n", iteration++);
+	debugLogf("outside finished!\n");
 }
 
 void sample_coroutine68k_ioWaiting(WaitTest& wait)
 {
-#ifdef MEASURE_TIME
-	wait.init();
-	int iteration;
-
-	for (iteration = 0; iteration < 7; iteration++)
-	{
-		if (iteration == 3)
-			wait.gotIt = true;
-		wait.run();
-	}
-#else
-	printf("%s\n", __func__);
+	debugLogf("%s\n", __func__);
 
 	wait.init();
 	int iteration;
@@ -130,12 +76,11 @@ void sample_coroutine68k_ioWaiting(WaitTest& wait)
 		bool ret = wait.run();
 		if (ret)
 		{
-			printf("T %d\n", iteration);
+			debugLogf("T %d\n", iteration);
 		}
 		else
 		{
-			printf("F %d\n", iteration);
+			debugLogf("F %d\n", iteration);
 		}
 	}
-#endif
 }

@@ -28,28 +28,11 @@ bool Inner::Run()
 	PT_BEGIN();
 
 	iteration = 0;
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("    - %d\n", iteration++);
-#endif
-
+	debugLogf("    - %d\n", iteration++);
 	PT_YIELD();
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("    - %d\n", iteration++);
-#endif
-
+	debugLogf("    - %d\n", iteration++);
 	PT_YIELD();
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("    - %d\n", iteration++);
-#endif
+	debugLogf("    - %d\n", iteration++);
 
 	PT_END();
 }
@@ -57,54 +40,27 @@ bool Inner::Run()
 bool Outer::Run()
 {
 	PT_BEGIN();
+
 	iterationOuter = 0;
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("  - %d\n", iterationOuter++);
-#endif
-
+	debugLogf("  - %d\n", iterationOuter++);
 	PT_YIELD();
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("  - %d\n", iterationOuter++);
-#endif
-
+	debugLogf("  - %d\n", iterationOuter++);
 	PT_SPAWN(in);
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("  - %d\n", iterationOuter++);
-#endif
-
+	debugLogf("  - %d\n", iterationOuter++);
 	PT_SPAWN(in);
-
-#ifdef MEASURE_TIME
-	dontOptimizeMeOut();
-#else
-	printf("  - %d\n", iterationOuter++);
-#endif
+	debugLogf("  - %d\n", iterationOuter++);
 
 	PT_END();
 }
 
 void sample_stackless_protoThread()
 {
-#ifdef MEASURE_TIME
-	while (co.Run())
-		;
-#else
-	printf("%s\n", __func__);
+	debugLogf("%s\n", __func__);
 	int iteration = 0;
-	printf("- %d\n", iteration++);
+	debugLogf("- %d\n", iteration++);
 	while (co.Run())
 	{
-		printf("- %d\n", iteration++);
+		debugLogf("- %d\n", iteration++);
 	}
-	printf("- %d\n", iteration++);
-#endif
+	debugLogf("- %d\n", iteration++);
 }
