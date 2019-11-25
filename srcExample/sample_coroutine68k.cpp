@@ -54,7 +54,7 @@ void sample_coroutine68k_innerOuter()
 	debugLogf("%s\n", __func__);
 	int iteration = 0;
 	debugLogf("- %d\n", iteration++);
-	while (!cotest.run())
+	while (!cotest())
 	{
 		debugLogf("- %d\n", iteration++);
 	}
@@ -73,7 +73,7 @@ void sample_coroutine68k_ioWaiting(WaitTest& wait)
 	{
 		if (iteration == 3)
 			wait.gotIt = true;
-		bool ret = wait.run();
+		bool ret = wait();
 		if (ret)
 		{
 			debugLogf("T %d\n", iteration);

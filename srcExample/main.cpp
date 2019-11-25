@@ -115,9 +115,9 @@ int main(int argc, char** argv)
 	jumpInOut.init();
 
 	printf("ciaa ticks inside jumpInOut %d\n",
-		   measureTime(std::bind(&JumpInOutCoroutine::run, &jumpInOut)));
+		   measureTime(std::bind(&JumpInOutCoroutine::operator(), &jumpInOut)));
 	printf("ciaa ticks inside jumpInOut %d\n",
-		   measureTime(std::bind(&JumpInOutCoroutine::run, &jumpInOut)));
+		   measureTime(std::bind(&JumpInOutCoroutine::operator(), &jumpInOut)));
 	printf("ciaa ticks inside jumpInOut std::bind empty %d\n",
 		   measureTime(std::bind(&JumpInOutCoroutine::empty, &jumpInOut)));
 

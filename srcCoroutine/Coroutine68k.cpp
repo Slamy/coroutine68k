@@ -84,7 +84,7 @@ void Coroutine68k::init()
 	yielded = true;
 }
 
-bool Coroutine68k::run()
+bool Coroutine68k::operator()()
 {
 	if (yielded == true)
 	{

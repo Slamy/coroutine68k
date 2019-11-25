@@ -71,7 +71,7 @@ class Coroutine68k
 	 * Resume the Coroutine.
 	 * @return	True if Coroutine has finished execution. False if yielded.
 	 */
-	bool run();
+	bool operator()();
 
 	/**
 	 * Set the Coroutine to start position and make it resumable.
