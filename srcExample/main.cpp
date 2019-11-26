@@ -76,7 +76,7 @@ class JumpInOutCoroutine : public Coroutine68k
   public:
 	void func() override
 	{
-		for(;;)
+		for (;;)
 		{
 			coYield();
 			breakpoint();
@@ -134,7 +134,8 @@ int main(int argc, char** argv)
 
 	jumpInOut();
 	jumpInOut();
-	
+	jumpInOut();
+
 	printf("ciaa ticks inside jumpInOut %d\n",
 		   measureTime(std::bind(&JumpInOutCoroutine::operator(), &jumpInOut)));
 	printf("ciaa ticks inside jumpInOut %d\n",

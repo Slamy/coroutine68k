@@ -10,15 +10,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-void Coroutine68k::internalStop()
-{
-	yielded = false; // define the context as invalid
-	discardCoroutineReturnNormal();
-
-	// this line must never be reached.
-	assert(false);
-}
-
 void Coroutine68k::init()
 {
 	/*
@@ -82,14 +73,4 @@ void Coroutine68k::init()
 
 	// mark the context as established
 	yielded = true;
-}
-
-bool Coroutine68k::operator()()
-{
-	if (yielded == true)
-	{
-		saveNormalRestoreCoroutine();
-	}
-
-	return !yielded;
 }

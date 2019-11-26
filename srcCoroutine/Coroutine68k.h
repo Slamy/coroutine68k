@@ -47,7 +47,14 @@ class Coroutine68k
 
 	/// Internal C++ function which is the artifical caller of func() to catch a
 	/// return from func()
-	void internalStop();
+	void internalStop()
+	{
+		yielded = false; // define the context as invalid
+		discardCoroutineReturnNormal();
+
+		// this line must never be reached.
+		assert(false);
+	}
 
   public:
 	/**
@@ -71,7 +78,15 @@ class Coroutine68k
 	 * Resume the Coroutine.
 	 * @return	True if Coroutine has finished execution. False if yielded.
 	 */
-	bool operator()();
+	bool operator()()
+	{
+		if (yielded == true)
+		{
+			saveNormalRestoreCoroutine();
+		}
+
+		return !yielded;
+	}
 
 	/**
 	 * Set the Coroutine to start position and make it resumable.

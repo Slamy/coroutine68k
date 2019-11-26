@@ -27,7 +27,7 @@ Stack_cpp_this			rs.l	1
 ; void Coroutine68k::saveCoroutineReturnNormal()
 ; void saveCoroutineReturnNormal(Coroutine68k* this)
 saveCoroutineReturnNormal:
-	movem.l		Stack_cpp_this(sp),a0	; Get "this" pointer
+	move.l		Stack_cpp_this(sp),a0	; Get "this" pointer
 	movem.l 	d2-d7/a2-a6,-(sp)		; Save Coroutine context
 
 	; The stack at this point:
@@ -48,7 +48,7 @@ saveCoroutineReturnNormal:
 ; void Coroutine68k::saveNormalRestoreCoroutine()
 ; void saveNormalRestoreCoroutine(Coroutine68k* this)
 saveNormalRestoreCoroutine:
-	movem.l		Stack_cpp_this(sp),a0			; Get "this" pointer
+	move.l		Stack_cpp_this(sp),a0			; Get "this" pointer
 	movem.l 	d2-d7/a2-a6,-(sp)				; Save normal context
 
 	move.l		sp,Co68k_normalStack(a0)		; Save normal stack pointer to this->normalStack
@@ -61,7 +61,7 @@ saveNormalRestoreCoroutine:
 ; void Coroutine68k::discardCoroutineReturnNormal()
 ; void discardCoroutineReturnNormal(Coroutine68k* this)
 discardCoroutineReturnNormal:
-	movem.l		Stack_cpp_this(sp),a0		; Get "this" pointer
+	move.l		Stack_cpp_this(sp),a0		; Get "this" pointer
 	move.l		Co68k_normalStack(a0),sp	; Restore normal Stack from this->normalStack
 	movem.l		(sp)+,d2-d7/a2-a6			; Restore normal context
 
