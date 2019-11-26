@@ -76,12 +76,30 @@ class JumpInOutCoroutine : public Coroutine68k
   public:
 	void func() override
 	{
-		coYield();
-		coYield();
+		for(;;)
+		{
+			coYield();
+			breakpoint();
+			coYield();
+			breakpoint();
+			coYield();
+			breakpoint();
+			coYield();
+			breakpoint();
+			coYield();
+			breakpoint();
+		}
 		coYield();
 	}
 	void empty()
 	{
+	}
+
+	void breakpoint()
+	{
+		asm volatile("nop");
+		asm volatile("nop");
+		asm volatile("nop");
 	}
 
   private:
@@ -114,6 +132,9 @@ int main(int argc, char** argv)
 
 	jumpInOut.init();
 
+	jumpInOut();
+	jumpInOut();
+	
 	printf("ciaa ticks inside jumpInOut %d\n",
 		   measureTime(std::bind(&JumpInOutCoroutine::operator(), &jumpInOut)));
 	printf("ciaa ticks inside jumpInOut %d\n",

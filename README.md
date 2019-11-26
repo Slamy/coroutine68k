@@ -76,14 +76,64 @@ The rest is some C++ magic inside the Coroutine68k class.
 The project does use the CIAA timer to perform some measurements.
 When the project is compiled with MEASURE_TIME enabled, debug logging is disabled and the values can be used for profiling.
 
-    ciaa ticks inside empty 12
-    ciaa ticks inside test_protoThread 101
-    ciaa ticks inside test_innerOuter 436
-    ciaa ticks inside test_ioWaiting(wait_lambda) 313
-    ciaa ticks inside test_ioWaiting(wait_macro) 279
-    ciaa ticks inside empty 11
+	ciaa ticks inside empty 11
+	ciaa ticks inside test_protoThread 136
+	ciaa ticks inside test_innerOuter 265
+	ciaa ticks inside test_ioWaiting(wait_lambda) 245
+	ciaa ticks inside test_ioWaiting(wait_macro) 200
+	ciaa ticks inside empty 11
+	ciaa ticks inside jumpInOut 51
+	ciaa ticks inside jumpInOut 51
+	ciaa ticks inside jumpInOut std::bind empty 15
 
 These results might explain why C++20 is planned to use stackless coroutines.
 These small examples might not be that representative but the context switching seems to take more time.
 Also I've compared macros against lambdas for checking waiting conditions and it again seems that the C approach is a little bit more performant.
 Further investigation might be needed at this point.
+
+JumpInOutCoroutine was added to allow direct instruction tracing of a switch from a coroutine out and directly back in.
+
+	 0 00005230 4e71                     NOP
+	 0 00005232 4e71                     NOP
+	 0 00005234 4e71                     NOP
+	 0 00005236 2f02                     MOVE.L D2,-(A7)
+	 0 00005238 4e92                     JSR (A2)
+	
+	 * saveCoroutineReturnNormal:
+	 0 0000677E 206f 0004                MOVEA.L (A7, $0004) == $0000c904,A0
+	 0 00006782 48e7 3f3e                MOVEM.L D2-D7/A2-A6,-(A7)
+	 0 00006786 214f 0008                MOVE.L A7,(A0, $0008) == $0000c564
+	 0 0000678A 2e68 0004                MOVEA.L (A0, $0004) == $0000c560,A7
+	 0 0000678E 4cdf 7cfc                MOVEM.L (A7)+,D2-D7/A2-A6
+	 0 00006792 4e75                     RTS
+	
+	 * continue Coroutine68k::operator()()
+	 0 00005E5E 102a 000c                MOVE.B (A2, $000c) == $0000c568,D0
+	 0 00005E62 588f                     ADDA.L #$00000004,A7
+	 0 00005E64 0a00 0001                EOR.B #$01,D0
+	 0 00005E68 245f                     MOVEA.L (A7)+,A2
+	 0 00005E6A 4e75                     RTS
+	
+	 * return to main
+	 0 00005B9C 4879 0000 c55c           PEA.L 0000c55c
+	 0 00005BA2 4e93                     JSR (A3)
+	
+	 * Coroutine68k::operator()()
+	 0 00005E42 2f0a                     MOVE.L A2,-(A7)
+	 0 00005E44 246f 0008                MOVEA.L (A7, $0008) == $0007fe7c,A2
+	 0 00005E48 102a 000c                MOVE.B (A2, $000c) == $0000c568,D0
+	 0 00005E4C 6608                     BNE.B #$00000008 == $00005e56 (T)
+	 0 00005E56 2f0a                     MOVE.L A2,-(A7)
+	 0 00005E58 4eb9 0000 6794           JSR saveNormalRestoreCoroutine
+	
+	 * saveNormalRestoreCoroutine:
+	 0 00006794 206f 0004                MOVEA.L (A7, $0004) == $0007fe70,A0
+	 0 00006798 48e7 3f3e                MOVEM.L D2-D7/A2-A6,-(A7)
+	 0 0000679C 214f 0004                MOVE.L A7,(A0, $0004) == $0000c560
+	 0 000067A0 2e68 0008                MOVEA.L (A0, $0008) == $0000c564,A7
+	 0 000067A4 4cdf 7cfc                MOVEM.L (A7)+,D2-D7/A2-A6
+	 0 000067A8 4e75                     RTS
+	 0 0000523A 4e71                     NOP
+	 0 0000523C 4e71                     NOP
+	 0 0000523E 4e71                     NOP
+ 
