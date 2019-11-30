@@ -8,19 +8,26 @@
 #ifndef INCLUDE_UART_H_
 #define INCLUDE_UART_H_
 
-// common
-void uart_init();
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
-// only bare metal
-void uart_printChar(char c);
-int uart_blockedGetChar();
+	// common
+	void uart_init();
 
-// only OS
+	// only bare metal
+	void uart_printChar(char c);
+	int uart_blockedGetChar();
 
-void uart_printf(const char* format, ...);
-void uart_puts(char* str);
-void uart_close();
+	// only OS
 
+	void uart_printf(const char* format, ...);
+	void uart_puts(char* str);
+	void uart_close();
+#ifdef __cplusplus
+}
+#endif
 #define uart_assert(cond)                                                                          \
 	if (!(cond))                                                                                   \
 	{                                                                                              \

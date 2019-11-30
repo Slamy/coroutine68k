@@ -1,8 +1,7 @@
-/*
- * sample_stackless.cpp
- *
- *  Created on: 24.11.2019
- *      Author: andre
+/**
+ * @file sample_stackless.cpp
+ * @date 24.11.2019
+ * @author andre
  */
 
 #include "config.h"
@@ -20,9 +19,16 @@
 #include "CiaMeasure.h"
 #include "sample_stackless.h"
 
+/// global construction to avoid construction having an influence on runtime.
 Inner in;
+
+/// global construction to avoid construction having an influence on runtime.
 Outer co(in);
 
+/**
+ * Yields quite some time and does only some test printing
+ * @return True as long as as coroutine hasn't ended
+ */
 bool Inner::Run()
 {
 	PT_BEGIN();
@@ -37,6 +43,10 @@ bool Inner::Run()
 	PT_END();
 }
 
+/**
+ * Yields quite some time and spawns and executes an inner coroutine for tests.
+ * @return True as long as as coroutine hasn't ended
+ */
 bool Outer::Run()
 {
 	PT_BEGIN();
@@ -53,6 +63,9 @@ bool Outer::Run()
 	PT_END();
 }
 
+/**
+ * Executes an \ref Outer coroutine until finished
+ */
 void sample_stackless_protoThread()
 {
 	debugLogf("%s\n", __func__);

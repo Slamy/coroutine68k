@@ -1,8 +1,7 @@
 /**
- * Coroutine68.cpp
- *
- *  Created on: 22.11.2019
- *      Author: andre
+ * @file Coroutine68k.cpp
+ * @date 22.11.2019
+ * @author andre
  */
 
 #include "Coroutine68k.h"
@@ -72,5 +71,5 @@ void Coroutine68k::init()
 	coroutineStack -= 11;
 
 	// mark the context as established
-	yielded = true;
+	contextValid = true;
 }

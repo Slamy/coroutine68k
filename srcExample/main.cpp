@@ -1,8 +1,7 @@
-/*
- * main.cpp
- *
- *  Created on: 22.06.2019
- *      Author: andre
+/**
+ * @file main.cpp
+ * @date 22.06.2019
+ * @author andre
  */
 
 #include "config.h"
@@ -36,7 +35,8 @@ extern "C"
 }
 
 #if !defined(BUILD_FOR_AMIGADOS)
-/*
+
+/**
  * FIXME I'm quite confused why this is needed. As it seems this is normally
  * done by libgcc and crtbegin.o inside of that lib. But I have the feeling that
  * libgloss which also provides crt0.o is not compatible with crtbegin.o. While
@@ -62,103 +62,78 @@ void staticConstructors()
 	}
 }
 
-// FIXME Why is this needed?
+/// FIXME Why is this needed?
 void* __dso_handle;
 
 #endif
 
+/**
+ * Just an empty function for runtime measurement of a function call
+ */
 void empty()
 {
 }
 
-class JumpInOutCoroutine : public Coroutine68k
-{
-  public:
-	void func() override
-	{
-		for (;;)
-		{
-			coYield();
-			breakpoint();
-			coYield();
-			breakpoint();
-			coYield();
-			breakpoint();
-			coYield();
-			breakpoint();
-			coYield();
-			breakpoint();
-		}
-		coYield();
-	}
-	void empty()
-	{
-	}
-
-	void breakpoint()
-	{
-		asm volatile("nop");
-		asm volatile("nop");
-		asm volatile("nop");
-	}
-
-  private:
-};
-
-JumpInOutCoroutine jumpInOut;
-
-LambdaWaitTest wait_lambda;
-MacroWaitTest wait_macro;
-
+/**
+ * Just the main function. duh.
+ * @param argc	ignored
+ * @param argv	ignored
+ * @return		always 0
+ */
 int main(int argc, char** argv)
 {
+	uint16_t time;
+
+	LambdaWaitTest wait_lambda;
+	MacroWaitTest wait_macro;
+
 	// set_debug_traps();
 #if !defined(BUILD_FOR_AMIGADOS)
 	staticConstructors();
 #endif
 	printf("Slamy's Coroutine Example for 68k\n");
 
-	printf("ciaa ticks inside empty %d\n", measureTime(empty));
-	printf("ciaa ticks inside test_protoThread %d\n", measureTime(sample_stackless_protoThread));
-	printf("ciaa ticks inside test_innerOuter %d\n", measureTime(sample_coroutine68k_innerOuter));
+	time = measureTime(empty);
+	printf("ticks inside empty %d\n", time);
 
-	printf("ciaa ticks inside test_ioWaiting(wait_lambda) %d\n",
-		   measureTime(std::bind(sample_coroutine68k_ioWaiting, wait_lambda)));
+	time = measureTime(sample_stackless_protoThread);
+	printf("ticks inside test_protoThread %d\n", time);
 
-	printf("ciaa ticks inside test_ioWaiting(wait_macro) %d\n",
-		   measureTime(std::bind(sample_coroutine68k_ioWaiting, wait_macro)));
+	time = measureTime(sample_coroutine68k_innerOuter);
+	printf("ticks inside test_innerOuter %d\n", time);
 
-	printf("ciaa ticks inside empty %d\n", measureTime(empty));
+	time = measureTime(std::bind(sample_coroutine68k_ioWaiting, wait_lambda));
+	printf("ticks inside test_ioWaiting(wait_lambda) %d\n", time);
 
-	jumpInOut.init();
+	time = measureTime(std::bind(sample_coroutine68k_ioWaiting, wait_macro));
+	printf("ticks inside test_ioWaiting(wait_macro) %d\n", time);
 
-	jumpInOut();
-	jumpInOut();
-	jumpInOut();
+	time = measureTime(empty);
+	printf("ticks inside empty %d\n", time);
 
-	printf("ciaa ticks inside jumpInOut %d\n",
-		   measureTime(std::bind(&JumpInOutCoroutine::operator(), &jumpInOut)));
-	printf("ciaa ticks inside jumpInOut %d\n",
-		   measureTime(std::bind(&JumpInOutCoroutine::operator(), &jumpInOut)));
-	printf("ciaa ticks inside jumpInOut std::bind empty %d\n",
-		   measureTime(std::bind(&JumpInOutCoroutine::empty, &jumpInOut)));
+	sample_jumpInOut();
+	sample_parsers();
+	sample_generators();
 
-	// printf("ciaa ticks inside empty %d\n", measureTime(std::bind(jumpInOut, run)));
-
+	printf("finished with everything\n");
 	return 0;
 }
 
-// FIXME can this be removed?
-// Sorgt dafür, dass exception demangling nicht eingelinkt wird!
-// https://developer.mbed.org/forum/platform-32-ST-Nucleo-L152RE-community/topic/4802/?page=2#comment-25593
 namespace __gnu_cxx
 {
+/**
+ * FIXME can this be removed?
+ * Sorgt dafür, dass exception demangling nicht eingelinkt wird!
+ * https://developer.mbed.org/forum/platform-32-ST-Nucleo-L152RE-community/topic/4802/?page=2#comment-25593
+ */
 void __verbose_terminate_handler()
 {
 	for (;;)
 		;
 }
 } // namespace __gnu_cxx
+
+/// I forgot what this is
 extern "C" void __cxa_pure_virtual(void);
 extern "C" void __cxa_pure_virtual(void)
 {

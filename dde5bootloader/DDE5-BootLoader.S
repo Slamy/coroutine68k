@@ -12,7 +12,7 @@ MyUserStack=$7fffc			;SSP is at a safe place, but set user
 					;stack.
 
 DEST_ADDR = $5000
-NUMBER_SECTORS = 62
+NUMBER_SECTORS = 70
 
 MFMsync	=$4489				;AmigaDOS standard sync marker.
 MFMlen	=12980				;Legacy trackdata read length in bytes

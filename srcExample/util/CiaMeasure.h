@@ -1,8 +1,7 @@
-/*
- * CiaMeasure.h
- *
- *  Created on: 24.11.2019
- *      Author: andre
+/**
+ * @file CiaMeasure.h
+ * @date 24.11.2019
+ * @author andre
  */
 
 #ifndef SRCEXAMPLE_CIAMEASURE_H_
@@ -27,6 +26,10 @@ extern "C"
 #endif
 }
 
+/**
+ * Will call printf if MEASURE_TIME is not defined.
+ * Otherwise it does some volatile stuff to avoid being optimized out.
+ */
 static inline void debugLogf(const char* format, ...)
 {
 #ifdef MEASURE_TIME
@@ -41,9 +44,13 @@ static inline void debugLogf(const char* format, ...)
 #endif
 }
 
+/**
+ * Executes a function and returns the time passed by in form of CIAA ticks.
+ * @param funcToMeasure		Function to execute
+ * @return					Number of CIAA ticks it took to execute the given function
+ */
 static inline uint16_t measureTime(std::function<void()> funcToMeasure)
 {
-
 #ifdef MEASURE_TIME
 	// disable interrupts
 #ifdef BUILD_FOR_AMIGADOS

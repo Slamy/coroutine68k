@@ -145,4 +145,8 @@ add_custom_target(applyCodeStyle
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
+add_custom_target(doxygen
+  COMMAND doxygen
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
 
