@@ -15,6 +15,8 @@ SET (SOURCES
 	srcExample/main.cpp
 	srcCoroutine/Coroutine68k.cpp
 	srcExample/sample_coroutine68k.cpp
+	srcExample/sample_cogenerator.cpp
+	srcExample/sample_coparser.cpp
 	srcExample/sample_stackless.cpp
 	context.o
 )

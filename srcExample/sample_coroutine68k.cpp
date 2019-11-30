@@ -69,40 +69,6 @@ void JumpInOutCoroutine::func()
 	coYield();
 }
 
-void TestGenerator::func()
-{
-	debugLogf("TestGenerator: I'm alive and ready to push some chars\n");
-
-	const char* ptr = text;
-	while (*ptr)
-		sink(*(ptr++));
-}
-
-void TestParser::func()
-{
-	const char* ptr = pattern;
-	debugLogf("TestParser: I'm alive and ready to take your tokens\n");
-	for (;;)
-	{
-		char in = source();
-		if (in == *ptr)
-		{
-			debugLogf("Accepted %c\n", in);
-			ptr++;
-			if (*ptr == '\0')
-			{
-				debugLogf("Detected target string!\n");
-				ptr = pattern;
-			}
-		}
-		else
-		{
-			debugLogf("Denied %c\n", in);
-			ptr = pattern;
-		}
-	}
-}
-
 /**
  * executes \ref cotest until finished. used as way to measure performance against
  * \ref sample_stackless_protoThread
@@ -170,72 +136,4 @@ void sample_jumpInOut()
 	printf("ticks inside jumpInOut %d\n", time);
 	time = measureTime(std::bind(&JumpInOutCoroutine::empty, &jumpInOut));
 	printf("ticks inside jumpInOut std::bind empty %d\n", time);
-}
-
-/**
- * Provides some example uses of \ref TestGenerator.
- */
-void sample_generators()
-{
-	TestGenerator gen("Hallo");
-	uint16_t time;
-
-	time = measureTime([&] {
-		gen.init();
-		while (gen.hasNext())
-		{
-			debugLogf("Got %c\n", gen());
-		}
-	});
-	printf("ticks using while loop + gen.hasNext() + gen() %d\n", time);
-
-	time = measureTime([&] {
-		for (auto it = gen.begin(); it != gen.end(); ++it)
-		{
-			debugLogf("Got %c\n", *it);
-		}
-	});
-	printf("ticks using iterator loop %d\n", time);
-
-	time = measureTime([&] {
-		for (char out : gen)
-		{
-			debugLogf("Got %c\n", out);
-		}
-	});
-	printf("ticks using range loop %d\n", time);
-}
-
-/**
- * Executes some parsers as examples
- */
-void sample_parsers()
-{
-	uint16_t time;
-
-	TestParser parserTest("ABC");
-	parserTest.init();
-
-	parserTest('A');
-	parserTest('x');
-	parserTest('A');
-
-	time = measureTime(std::bind(&TestParser::operator(), &parserTest, 'B'));
-	printf("ticks inside parserTest %d\n", time);
-	time = measureTime(std::bind(&TestParser::operator(), &parserTest, 'C'));
-	printf("ticks inside parserTest %d\n", time);
-
-	parserTest('B');
-	parserTest('C');
-	parserTest('x');
-
-	TestParserString parserTest2;
-	parserTest2.init();
-	parserTest2(std::string("Barf"));
-	parserTest2(std::string("Barf2!"));
-
-	TestParserRandomObject parserTest3;
-	parserTest3.init();
-	RandomObject r(42);
-	parserTest3(&r);
 }

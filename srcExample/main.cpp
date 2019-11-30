@@ -21,6 +21,8 @@
 #include "Coroutine68k.h"
 #include "Protothread.h"
 
+#include "sample_cogenerator.h"
+#include "sample_coparser.h"
 #include "sample_coroutine68.h"
 #include "sample_stackless.h"
 

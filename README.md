@@ -76,17 +76,25 @@ The rest is some C++ magic inside the Coroutine68k class.
 The project does use the CIAA timer to perform some measurements.
 When the project is compiled with MEASURE_TIME enabled, debug logging is disabled and the values can be used for profiling.
 This is the output executed on an emulated A1200 without further modifications. The numbers represents CIAA ticks.
+Execute `scripts/serialout.sh` to open a virtual serial port.
+Execute `fs-uae a1200.fs-uae` and you should get similar results on the serial port.
 
 	Slamy's Coroutine Example for 68k
-	ciaa ticks inside empty 12
-	ciaa ticks inside test_protoThread 137
-	ciaa ticks inside test_innerOuter 263
-	ciaa ticks inside test_ioWaiting(wait_lambda) 208
-	ciaa ticks inside test_ioWaiting(wait_macro) 179
-	ciaa ticks inside empty 11
-	ciaa ticks inside jumpInOut 50
-	ciaa ticks inside jumpInOut 51
-	ciaa ticks inside jumpInOut std::bind empty 17
+	ticks inside empty 11
+	ticks inside test_protoThread 136
+	ticks inside test_innerOuter 241
+	ticks inside test_ioWaiting(wait_lambda) 215
+	ticks inside test_ioWaiting(wait_macro) 189
+	ticks inside empty 11
+	ticks inside jumpInOut 51
+	ticks inside jumpInOut 50
+	ticks inside jumpInOut std::bind empty 14
+	ticks inside parserTest(B) 61
+	ticks inside parserTest(C) 62
+	ticks using while loop + gen.hasNext() + gen() 231
+	ticks using iterator loop 215
+	ticks using range loop 217
+
 
 
 These results might explain why C++20 is planned to use stackless coroutines.
