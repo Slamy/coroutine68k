@@ -18,13 +18,14 @@ void Coroutine68k::init()
 	 */
 
 	/*
-	 * This is a very dirty way to extract internal representation of C++ function
-	 * pointers
+	 * This is a very dirty way to extract the internal representation of C++ function
+	 * pointers.
 	 * FIXME Is there a better way?
+	 * This is not possible with GCC:
+	 * *coroutineStack = reinterpret_cast<uint32_t>(&Coroutine68k::internalStop);
 	 */
 	union {
-		bool (Coroutine68k::*fn)(void);
-		void (Coroutine68k::*fn2)(void);
+		void (Coroutine68k::*fn)(void);
 
 		// Lowest bit of val[0] marks if this is a virtual call?
 		// If bit 0 is set it's an offset on the vtable -1 in bytes
@@ -40,31 +41,21 @@ void Coroutine68k::init()
 	coroutineStack = (uint32_t*)((uint32_t)&stack[stackSize] & ~3);
 
 	// add "this" pointer as parameter for Coroutine68k::internalStop()
-	// when Coroutine68k::func() returns
 	coroutineStack--;
 	*coroutineStack = reinterpret_cast<uint32_t>(this);
 
-	// add "this" pointer as parameter for Coroutine68k::func()
+	// add fake return address for Coroutine68k::internalStop() which doesn't really have a caller.
+	// that's the reason why internalStop() is not allowed to return
 	coroutineStack--;
-	*coroutineStack = reinterpret_cast<uint32_t>(this);
+	*coroutineStack = 0;
 
 	/*
-	 * add return address after Coroutine68k::func() returns. In this case let's
-	 * make it look like it was called by Coroutine68k::internalStop
+	 * add function pointer to Coroutine68k::internalStop() as return address on stack for
+	 * saveNormalRestoreCoroutine() to use to call internalStop() by returning.
 	 */
 	coroutineStack--;
-	temp.fn2		= &Coroutine68k::internalStop;
+	temp.fn			= &Coroutine68k::internalStop;
 	*coroutineStack = temp.val[0];
-
-	// get function pointer to virtual void Coroutine68k::func() using vtable
-	temp.fn2		 = &Coroutine68k::func;
-	uint32_t* vtable = *reinterpret_cast<uint32_t**>(reinterpret_cast<char*>(this) + temp.val[1]);
-	uint32_t funcPtr =
-		vtable[(temp.val[0] - 1) / 4]; // If bit 0 is set it's an offset on the vtable -1 in bytes
-
-	// add function pointer to Coroutine68k::func() as return address on stack.
-	coroutineStack--;
-	*coroutineStack = funcPtr;
 
 	// d2-d7/a2-a6 are saved as context. d0,d1,a0,a1,a7 are missing as they are
 	// temporary for GCC So 16 - 5 = 11 registers need space.

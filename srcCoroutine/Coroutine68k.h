@@ -46,10 +46,22 @@ class Coroutine68k
 	/// context.
 	void discardCoroutineReturnNormal() asm("discardCoroutineReturnNormal");
 
-	/// Internal C++ function which is the artifical caller of func() to catch a
-	/// return from func()
+	/**
+	 * Internal C++ function which is the start of execution of the coroutine and the artificial
+	 * caller of func() to catch a return from func() as leaving the coroutine context is not
+	 * possible through return.
+	 */
 	void internalStop()
 	{
+		// start the coroutine
+		func();
+
+		/*
+		 * If we have reached this point this means that the coroutine has stopped execution by
+		 * returning without yielding. But there is nothing to return to. So at this point we define
+		 * that the context is now invalid and continue execution on the normal context.
+		 */
+
 		contextValid = false;
 		discardCoroutineReturnNormal();
 
@@ -79,11 +91,19 @@ class Coroutine68k
 	{
 	}
 
+	// clang-format off
 	/**
-	 * Set the Coroutine to start position and make it resumable.
-	 * Doesn't execute yet.
+	 * Initializes separate stack for Coroutine but doesn't execute it yet.
+	 * The stack is constructed like this:
+	 * ---------------- Top End of Stack
+	 * [     this     ] The first parameter of internalStop which is the this pointer of this class.
+	 * [      0       ] Usually this would be the return address of internalStop. But it doesn't exist.
+	 * [ internalStop ] Pointer to internalStop() as the return address of saveNormalRestoreCoroutine()
+	 * [  d2-d7/a2-a6 ] 11 Words. Suspended registers. Used by functions in context.asm
+	 *      V V V V     Growing direction of stack.
 	 */
 	void init();
+	// clang-format on
 
 #ifdef DEBUG_RUNTIME_CHECK
 	/**
